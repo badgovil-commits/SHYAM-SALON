@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#111111">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="SHYAM SALON">
+<title>SHYAM SALON — Book an Appointment</title>
+<style>
+:root{
+  --bg:#f6f3ef; --card:#fff; --ink:#171717; --muted:#777;
+  --accent:#171717; --soft:#eee9e3; --success:#1f7a4d; --danger:#a63d40;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+button,input,select{font:inherit}
+.app{max-width:620px;margin:auto;min-height:100vh;padding-bottom:40px}
+header{background:#171717;color:white;padding:34px 22px 28px;border-radius:0 0 28px 28px}
+.brand{font-size:29px;font-weight:800;letter-spacing:2px}
+.tag{opacity:.72;margin-top:6px;font-size:14px}
+main{padding:20px 16px}
+.card{background:var(--card);border-radius:20px;padding:18px;margin-bottom:16px;box-shadow:0 5px 20px #00000009}
+h2{font-size:18px;margin:0 0 14px}
+.services{display:grid;gap:10px}
+.service{display:flex;align-items:center;justify-content:space-between;padding:15px;border:2px solid var(--soft);border-radius:15px;background:white;cursor:pointer}
+.service.selected{border-color:var(--ink);background:#f5f2ee}
+.service strong{display:block}
+.service small{color:var(--muted)}
+.price{font-weight:800}
+.dates{display:flex;gap:9px;overflow-x:auto;padding-bottom:3px}
+.date{min-width:70px;padding:11px 7px;border:2px solid var(--soft);border-radius:14px;background:white;text-align:center;cursor:pointer}
+.date.selected{background:var(--ink);color:white;border-color:var(--ink)}
+.date b{display:block;font-size:16px}
+.date small{font-size:11px}
+.slots{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.slot{padding:12px 5px;border:2px solid var(--soft);border-radius:12px;background:white;cursor:pointer}
+.slot.selected{background:var(--ink);color:white;border-color:var(--ink)}
+.slot.booked{background:#eee;color:#aaa;text-decoration:line-through;cursor:not-allowed}
+label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}
+input{width:100%;padding:13px;border:2px solid var(--soft);border-radius:12px;outline:none}
+input:focus{border-color:var(--ink)}
+.primary{width:100%;border:0;border-radius:14px;background:var(--ink);color:white;padding:15px;font-weight:800;margin-top:16px;cursor:pointer}
+.secondary{width:100%;border:2px solid var(--ink);border-radius:14px;background:white;color:var(--ink);padding:13px;font-weight:800;margin-top:10px;cursor:pointer}
+.hidden{display:none!important}
+.confirm{text-align:center;padding:28px 15px}
+.check{font-size:48px}
+.booking-id{font-weight:800;font-size:20px;margin:8px 0}
+.notice{padding:12px;border-radius:12px;background:#edf7f1;color:var(--success);font-size:13px;margin-top:12px}
+nav{display:flex;gap:8px;margin-bottom:16px}
+.navbtn{flex:1;padding:11px;border:2px solid var(--soft);border-radius:12px;background:white;font-weight:700}
+.navbtn.active{background:var(--ink);color:white;border-color:var(--ink)}
+.booking{border:1px solid var(--soft);border-radius:14px;padding:14px;margin-bottom:10px}
+.booking-top{display:flex;justify-content:space-between;gap:10px}
+.badge{font-size:11px;padding:5px 8px;border-radius:8px;background:#eee}
+.empty{text-align:center;color:var(--muted);padding:25px}
+footer{text-align:center;color:#999;font-size:12px;padding:10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header>
+  <div class="brand">SHYAM SALON</div>
+  <div class="tag">Book your style. Your time.</div>
+</header>
+
+<main>
+<nav>
+  <button class="navbtn active" id="bookTab" onclick="showView('book')">Book Appointment</button>
+  <button class="navbtn" id="manageTab" onclick="showView('manage')">Salon Bookings</button>
+</nav>
+
+<section id="bookView">
+  <div class="card">
+    <h2>1. Choose a service</h2>
+    <div class="services" id="services"></div>
+  </div>
+
+  <div class="card">
+    <h2>2. Choose a date</h2>
+    <div class="dates" id="dates"></div>
+  </div>
+
+  <div class="card">
+    <h2>3. Choose a time</h2>
+    <div class="slots" id="slots"></div>
+  </div>
+
+  <div class="card">
+    <h2>4. Your details</h2>
+    <label for="name">Name</label>
+    <input id="name" placeholder="Enter your name">
+    <label for="phone">Mobile number</label>
+    <input id="phone" type="tel" inputmode="numeric" placeholder="Enter mobile number">
+    <button class="primary" onclick="bookAppointment()">CONFIRM BOOKING</button>
+    <div id="error" class="notice hidden"></div>
+  </div>
+
+  <div class="card confirm hidden" id="confirmation">
+    <div class="check">✓</div>
+    <h2>Booking confirmed!</h2>
+    <div id="confirmText"></div>
+    <div class="booking-id" id="bookingId"></div>
+    <div class="notice">Please arrive 5–10 minutes before your appointment.</div>
+    <button class="secondary" onclick="newBooking()">BOOK ANOTHER APPOINTMENT</button>
+  </div>
+</section>
+
+<section id="manageView" class="hidden">
+  <div class="card">
+    <h2>Today's & upcoming bookings</h2>
+    <div id="bookingList"></div>
+    <button class="secondary" onclick="clearDemoBookings()">Clear all bookings</button>
+  </div>
+</section>
+</main>
+
+<footer>SHYAM SALON • Appointment Booking</footer>
+</div>
+
+<script>
+const services = [
+  {name:"Haircut", price:300, mins:30},
+  {name:"Haircut + Beard", price:450, mins:45},
+  {name:"Beard Trim", price:200, mins:20},
+  {name:"Hair Spa", price:800, mins:60},
+  {name:"Hair Colour", price:1000, mins:90}
+];
+
+const times = ["10:00 AM","10:30 AM","11:00 AM","11:30 AM","12:00 PM","12:30 PM",
+"2:00 PM","2:30 PM","3:00 PM","3:30 PM","4:00 PM","4:30 PM",
+"5:00 PM","5:30 PM","6:00 PM","6:30 PM","7:00 PM","7:30 PM","8:00 PM"];
+
+let selectedService = services[0];
+let selectedDate = dateKey(new Date());
+let selectedTime = null;
+
+function dateKey(d){
+  return d.toISOString().slice(0,10);
+}
+function formatDate(d){
+  return d.toLocaleDateString("en-IN",{day:"2-digit",month:"short",year:"numeric"});
+}
+function loadBookings(){
+  return JSON.parse(localStorage.getItem("shyamSalonBookings") || "[]");
+}
+function saveBookings(b){localStorage.setItem("shyamSalonBookings",JSON.stringify(b));}
+
+function renderServices(){
+  document.getElementById("services").innerHTML=services.map((s,i)=>`
+    <div class="service ${i===0?'selected':''}" onclick="selectService(${i},this)">
+      <div><strong>${s.name}</strong><small>${s.mins} min</small></div>
+      <div class="price">₹${s.price}</div>
+    </div>`).join("");
+}
+function selectService(i,el){
+  selectedService=services[i];
+  document.querySelectorAll(".service").forEach(x=>x.classList.remove("selected"));
+  el.classList.add("selected"); renderSlots();
+}
+function renderDates(){
+  const now=new Date();
+  let out="";
+  for(let i=0;i<14;i++){
+    const d=new Date(now); d.setDate(now.getDate()+i);
+    const key=dateKey(d);
+    const day=i===0?"Today":d.toLocaleDateString("en-IN",{weekday:"short"});
+    out+=`<button class="date ${key===selectedDate?'selected':''}" onclick="selectDate('${key}')">
+      <small>${day}</small><b>${d.getDate()}</b><small>${d.toLocaleDateString("en-IN",{month:"short"})}</small>
+    </button>`;
+  }
+  document.getElementById("dates").innerHTML=out;
+}
+function selectDate(key){selectedDate=key;selectedTime=null;renderDates();renderSlots();}
+function renderSlots(){
+  const bookings=loadBookings();
+  const dayBookings=bookings.filter(b=>b.date===selectedDate);
+  document.getElementById("slots").innerHTML=times.map(t=>{
+    const taken=dayBookings.some(b=>b.time===t);
+    return `<button class="slot ${taken?'booked':''} ${selectedTime===t?'selected':''}"
+      ${taken?'disabled':''} onclick="selectTime('${t}',this)">${t}</button>`;
+  }).join("");
+}
+function selectTime(t,el){
+  selectedTime=t;
+  document.querySelectorAll(".slot").forEach(x=>x.classList.remove("selected"));
+  el.classList.add("selected");
+}
+function bookAppointment(){
+  const name=document.getElementById("name").value.trim();
+  const phone=document.getElementById("phone").value.trim();
+  const err=document.getElementById("error");
+  if(!name || phone.length<10 || !selectedTime){
+    err.textContent="Please enter your name, a valid mobile number, and choose a time slot.";
+    err.classList.remove("hidden"); return;
+  }
+  const bookings=loadBookings();
+  if(bookings.some(b=>b.date===selectedDate && b.time===selectedTime)){
+    err.textContent="Sorry, that slot was just booked. Please choose another time.";
+    err.classList.remove("hidden"); renderSlots(); return;
+  }
+  const id="SS"+Date.now().toString().slice(-6);
+  const booking={id,name,phone,date:selectedDate,time:selectedTime,service:selectedService.name,price:selectedService.price};
+  bookings.push(booking); saveBookings(bookings);
+  err.classList.add("hidden");
+  document.getElementById("confirmText").innerHTML=`${selectedService.name}<br>${formatDate(new Date(selectedDate+"T00:00:00"))} • ${selectedTime}<br>for ${name}`;
+  document.getElementById("bookingId").textContent="Booking ID: "+id;
+  document.getElementById("confirmation").classList.remove("hidden");
+  document.getElementById("confirmation").scrollIntoView({behavior:"smooth"});
+  renderSlots();
+}
+function newBooking(){
+  selectedTime=null;
+  document.getElementById("name").value="";
+  document.getElementById("phone").value="";
+  document.getElementById("confirmation").classList.add("hidden");
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+function showView(view){
+  const book=view==="book";
+  document.getElementById("bookView").classList.toggle("hidden",!book);
+  document.getElementById("manageView").classList.toggle("hidden",book);
+  document.getElementById("bookTab").classList.toggle("active",book);
+  document.getElementById("manageTab").classList.toggle("active",!book);
+  if(!book) renderBookings();
+}
+function renderBookings(){
+  const list=document.getElementById("bookingList");
+  const bookings=loadBookings().sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));
+  if(!bookings.length){list.innerHTML='<div class="empty">No bookings yet.</div>';return;}
+  list.innerHTML=bookings.map(b=>`
+    <div class="booking">
+      <div class="booking-top"><strong>${b.name}</strong><span class="badge">${b.id}</span></div>
+      <div>${b.service} • ₹${b.price}</div>
+      <div>${formatDate(new Date(b.date+"T00:00:00"))} • ${b.time}</div>
+      <div style="color:#777;font-size:13px;margin-top:5px">${b.phone}</div>
+    </div>`).join("");
+}
+function clearDemoBookings(){
+  if(confirm("Delete all bookings on this device?")){
+    localStorage.removeItem("shyamSalonBookings");renderBookings();renderSlots();
+  }
+}
+renderServices();renderDates();renderSlots();
+</script>
+</body>
+</html>
