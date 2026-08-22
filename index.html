@@ -42,6 +42,9 @@ button{font:inherit}
 @keyframes sleep{50%{transform:scale(1.1)}}
 .message{min-height:32px;font-size:20px;font-weight:1000}
 .progress{display:flex;justify-content:center;gap:8px;margin:6px}
+.navRow{display:flex;justify-content:space-between;gap:12px;margin:8px 4px 2px}
+.navBtn{border:0;background:#fff;border-radius:18px;padding:11px 16px;font-weight:1000;color:#2568c9;box-shadow:0 6px 16px #31265025}
+.navBtn:active{transform:scale(.94)}
 .star{font-size:30px;opacity:.25} .star.on{opacity:1}
 .reward{font-size:76px;animation:reward 1s ease-out}
 @keyframes reward{0%{transform:scale(.2);opacity:0}55%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
@@ -103,6 +106,10 @@ button{font:inherit}
       <div class="small">Tap and play 👆</div>
       <div id="actions" class="actions"></div>
       <div id="message" class="message"></div>
+      <div class="navRow">
+        <button id="prevHabit" class="navBtn">◀ Previous</button>
+        <button id="nextHabit" class="navBtn">Next ▶</button>
+      </div>
       <div id="progress" class="progress">
         <span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span><span class="star">⭐</span>
       </div>
@@ -203,6 +210,19 @@ function build(h){
 }
 document.querySelectorAll('.habitCard').forEach(b=>b.onclick=()=>openHabit(+b.dataset.i));
 hear.onclick=()=>slowSpeak(habits[current][2]);
+function goHabit(step){
+  current=(current+step+habits.length)%habits.length;
+  completed=false;
+  const h=habits[current];
+  hero.src=imgs[current];
+  hero.alt=h[0];
+  title.textContent=h[0];
+  bubble.textContent=h[2];
+  message.textContent='';
+  build(h);
+}
+document.getElementById('prevHabit').onclick=()=>goHabit(-1);
+document.getElementById('nextHabit').onclick=()=>goHabit(1);
 document.getElementById('back').onclick=()=>{game.style.display='none';home.style.display='block';speechSynthesis&&speechSynthesis.cancel()};
 </script>
 </body>
