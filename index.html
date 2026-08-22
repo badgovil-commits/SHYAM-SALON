@@ -25,6 +25,37 @@ button{font:inherit}
 .lesson{max-width:980px;height:calc(100% - 50px);margin:8px auto 0;background:#fffdf8e8;border-radius:28px;overflow:hidden;box-shadow:0 12px 35px #31265030;display:flex;flex-direction:column}
 .hero{height:50%;min-height:230px;background:#dff7ff;display:flex;justify-content:center;align-items:center;overflow:hidden;position:relative}
 .hero img{width:100%;height:100%;object-fit:cover}
+
+#sceneFX{position:absolute;inset:0;z-index:3;pointer-events:none;overflow:hidden}
+.hero img{transform-origin:center}
+.hero.sceneBrush img{animation:sceneBrush 2.4s ease-in-out infinite}
+.hero.sceneWash img{animation:sceneWash 2.7s ease-in-out infinite}
+.hero.sceneToys img{animation:sceneToys 2.8s ease-in-out infinite}
+.hero.sceneFood img{animation:sceneFood 2.4s ease-in-out infinite}
+.hero.sceneGentle img{animation:sceneGentle 2.7s ease-in-out infinite}
+.hero.sceneNails img{animation:sceneNails 2.5s ease-in-out infinite}
+.hero.sceneWater img{animation:sceneWater 2.5s ease-in-out infinite}
+.hero.sceneBed img{animation:sceneBed 3.2s ease-in-out infinite}
+@keyframes sceneBrush{0%,100%{transform:scale(1) translateX(0)}50%{transform:scale(1.025) translateX(-5px)}}
+@keyframes sceneWash{0%,100%{transform:scale(1)}50%{transform:scale(1.025) translateY(4px)}}
+@keyframes sceneToys{0%,100%{transform:scale(1)}50%{transform:scale(1.03) translateX(5px)}}
+@keyframes sceneFood{0%,100%{transform:scale(1)}50%{transform:scale(1.025) translateY(-4px)}}
+@keyframes sceneGentle{0%,100%{transform:scale(1)}50%{transform:scale(1.025) translateX(-4px)}}
+@keyframes sceneNails{0%,100%{transform:scale(1)}50%{transform:scale(1.03) translateX(4px)}}
+@keyframes sceneWater{0%,100%{transform:scale(1)}50%{transform:scale(1.025) translateY(-3px)}}
+@keyframes sceneBed{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+.fx{position:absolute;z-index:4;pointer-events:none}
+.fxMove{font-size:44px}
+.fxB{animation:fxB 1.2s ease-in-out infinite}
+.fxC{animation:fxC 1.8s ease-in-out infinite}
+.fxD{animation:fxD .8s linear infinite}
+.fxE{animation:fxE 1.4s ease-in-out infinite}
+.fxF{animation:fxF 2s ease-in-out infinite}
+@keyframes fxB{0%,100%{transform:translateX(-12px) rotate(-8deg)}50%{transform:translateX(30px) rotate(8deg)}}
+@keyframes fxC{0%{transform:translateY(12px) scale(.7);opacity:.2}50%{transform:translateY(-12px) scale(1.15);opacity:1}100%{transform:translateY(-28px) scale(.7);opacity:0}}
+@keyframes fxD{0%{transform:translateY(-10px);opacity:.15}100%{transform:translateY(30px);opacity:1}}
+@keyframes fxE{0%,100%{transform:translateY(6px) scale(.8);opacity:.45}50%{transform:translateY(-14px) scale(1.15);opacity:1}}
+@keyframes fxF{0%,100%{transform:scale(.9);opacity:.65}50%{transform:scale(1.12);opacity:1}}
 .instruction{position:absolute;left:50%;bottom:12px;transform:translateX(-50%);background:#fffdf4f2;border-radius:20px;padding:9px 15px;box-shadow:0 5px 18px #31265025;text-align:center;font-size:18px;font-weight:1000;white-space:nowrap;max-width:94%}
 .content{flex:1;overflow:auto;text-align:center;padding:10px 12px}
 .content h2{margin:2px;font-size:28px}
@@ -97,8 +128,7 @@ button{font:inherit}
     <button id="hear">🔊 Hear Slowly</button>
   </div>
   <div class="lesson">
-    <div class="hero">
-      <img id="heroImg" src="" alt="">
+    <div class="hero" id="heroScene"><div id="sceneFX" aria-hidden="true"></div><img id="heroImg" src="" alt="">
       <div id="bubble" class="instruction"></div>
     </div>
     <div class="content">
@@ -167,11 +197,81 @@ function win(text){
   actions.innerHTML='<div class="reward">🎉⭐</div>';confetti();
   document.querySelectorAll('.star').forEach((s,i)=>s.classList.toggle('on',i<Math.min(points,5)));
 }
+
+function animateScene(name){
+  const scene=document.getElementById('heroScene');
+  const fx=document.getElementById('sceneFX');
+  if(!scene || !fx)return;
+  scene.className='hero scene'+({
+    'Brush Your Teeth':'Brush',
+    'Wash Your Hands':'Wash',
+    'Clean Your Toys':'Toys',
+    'Eat Healthy Food':'Food',
+    'Please & Thank You':'Gentle',
+    'Be Gentle with Animals':'Gentle',
+    'Cut Your Nails':'Nails',
+    'Drink Water':'Water',
+    'Bedtime':'Bed'
+  }[name]||'');
+  fx.innerHTML='';
+  const add=(text,cls,left,top,delay='0s')=>{
+    const e=document.createElement('span');
+    e.className='fx fxMove '+cls;
+    e.textContent=text;
+    e.style.left=left;e.style.top=top;e.style.animationDelay=delay;
+    fx.appendChild(e);
+  };
+  if(name==='Brush Your Teeth'){
+    add('🪥','fxB','29%','58%');
+    add('🫧','fxC','48%','42%');
+    add('🫧','fxC','57%','46%','.35s');
+    add('✨','fxF','73%','30%');
+  }else if(name==='Wash Your Hands'){
+    add('🧼','fxE','69%','55%');
+    add('💧','fxD','46%','54%');
+    add('💧','fxD','54%','54%','.2s');
+    add('🫧','fxC','42%','43%');
+    add('🫧','fxC','60%','45%','.4s');
+  }else if(name==='Clean Your Toys'){
+    add('🧸','fxC','26%','62%');
+    add('🚗','fxC','45%','65%','.3s');
+    add('🧩','fxC','61%','63%','.6s');
+    add('✨','fxF','74%','33%');
+  }else if(name==='Eat Healthy Food'){
+    add('🍎','fxE','28%','58%');
+    add('🥕','fxE','54%','55%','.3s');
+    add('🥦','fxE','67%','59%','.6s');
+    add('✨','fxF','76%','32%');
+  }else if(name==='Please & Thank You'){
+    add('💗','fxE','52%','33%');
+    add('💛','fxE','62%','39%','.35s');
+    add('🙏','fxF','72%','48%','.7s');
+  }else if(name==='Be Gentle with Animals'){
+    add('❤️','fxE','67%','34%');
+    add('💕','fxE','76%','28%','.35s');
+    add('✨','fxF','73%','43%','.7s');
+  }else if(name==='Cut Your Nails'){
+    add('✂️','fxB','58%','57%');
+    add('✨','fxF','45%','39%');
+    add('✨','fxF','72%','34%','.4s');
+  }else if(name==='Drink Water'){
+    add('🥤','fxB','55%','51%');
+    add('💧','fxD','67%','38%');
+    add('💧','fxD','73%','43%','.25s');
+    add('✨','fxF','76%','30%');
+  }else if(name==='Bedtime'){
+    add('🌙','fxF','84%','10%');
+    add('💤','fxC','65%','30%');
+    add('⭐','fxF','20%','23%');
+    add('⭐','fxF','73%','22%','.45s');
+  }
+}
 function openHabit(i){
   current=i;completed=false;
   home.style.display='none';game.style.display='block';
   const h=habits[i];hero.src=imgs[i];hero.alt=h[0];
   title.textContent=h[0];bubble.textContent=h[2];message.textContent='';
+  animateScene(h[0]);
   build(h);
 }
 function build(h){
